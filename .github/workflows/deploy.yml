@@ -4,14 +4,14 @@ on:
   workflow_call:
 
 concurrency:
-  group: "pages-en"
+  group: "pages-jp"
   cancel-in-progress: true
 
 permissions:
   contents: write
 
 env:
-  L10n: en
+  L10n: jp
   
 jobs:
   deploy:
