@@ -1,0 +1,1257 @@
+<!doctype html><html lang="jp" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width, user-scalable=no initial-scale=1, shrink-to-fit=no, viewport-fit=cover" ><meta name="generator" content="Jekyll v4.3.4" /><meta property="og:title" content="XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出" /><meta name="author" content="ZhgChgLi" /><meta property="og:locale" content="jp" /><meta name="description" content="Xcodeユーザー向けにSwiftでRun Scriptを作成し、多言語LocalizationとImage Assetsの欠損を自動チェック。手間削減と品質向上を実現する具体的手法を紹介します。" /><meta property="og:description" content="Xcodeユーザー向けにSwiftでRun Scriptを作成し、多言語LocalizationとImage Assetsの欠損を自動チェック。手間削減と品質向上を実現する具体的手法を紹介します。" /><link rel="canonical" href="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/" /><meta property="og:url" content="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/" /><meta property="og:site_name" content="ZhgChgLi (Harry Li)" /><meta property="og:image" content="https://jp.zhgchg.li/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2020-09-17T23:53:20+08:00" /><meta name="twitter:card" content="summary_large_image" /><meta property="twitter:image" content="https://jp.zhgchg.li/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" /><meta property="twitter:title" content="XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出" /><meta name="twitter:site" content="@zhgchgli" /><meta name="twitter:creator" content="@zhgchgli" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"ZhgChgLi","url":"https://www.linkedin.com/in/zhgchgli"},"dateModified":"2024-04-13T16:35:25+08:00","datePublished":"2020-09-17T23:53:20+08:00","description":"Xcodeユーザー向けにSwiftでRun Scriptを作成し、多言語LocalizationとImage Assetsの欠損を自動チェック。手間削減と品質向上を実現する具体的手法を紹介します。","headline":"XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出","image":{"lqip":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNjAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJncmV5Ii8+PC9zdmc+","url":"https://jp.zhgchg.li/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp","@type":"imageObject"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/"},"url":"https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/"}</script><title>XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出 | ZhgChgLi (Harry Li)</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="ZhgChgLi (Harry Li)"><meta name="application-name" content="ZhgChgLi (Harry Li)"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="/assets/css/jekyll-theme-chirpy.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.32.2/dist/tocbot.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"> <script src="/assets/js/dist/theme.min.js"></script> <script defer src="https://cdn.jsdelivr.net/combine/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js,npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.umd.min.js,npm/glightbox@3.3.0/dist/js/glightbox.min.js,npm/clipboard@2.0.11/dist/clipboard.min.js,npm/dayjs@1.11.13/dayjs.min.js,npm/dayjs@1.11.13/locale/jp.js,npm/dayjs@1.11.13/plugin/relativeTime.js,npm/dayjs@1.11.13/plugin/localizedFormat.js,npm/tocbot@4.32.2/dist/tocbot.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script defer src="/app.min.js?baseurl=&register=false" ></script> <script defer src="https://www.googletagmanager.com/gtag/js?id=G-6WZJENT8WR"></script> <script> document.addEventListener('DOMContentLoaded', () => { window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-6WZJENT8WR'); }); </script><link rel="alternate" hreflang="en" href="https://en.zhgchg.li/posts/zrealm-dev/swift-run-script-in-xcode-localization-image-asset-checks-automated-41c49a75a743/"><link rel="alternate" hreflang="zh-Hans" href="https://zh-hans.zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8A%A8%E6%A3%80%E6%9F%A5%E5%A4%9A%E8%AF%AD%E7%B3%BB%E4%B8%8E%E5%9B%BE%E7%89%87%E8%B5%84%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E5%BC%80%E5%8F%91%E6%95%88%E7%8E%87-41c49a75a743/"><link rel="alternate" hreflang="zh-Hant" href="https://zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8B%95%E6%AA%A2%E6%9F%A5%E5%A4%9A%E8%AA%9E%E7%B3%BB%E8%88%87%E5%9C%96%E7%89%87%E8%B3%87%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E9%96%8B%E7%99%BC%E6%95%88%E7%8E%87-41c49a75a743/"><link rel="alternate" hreflang="jp" href="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/"><link rel="alternate" hreflang="x-default" href="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/"><link rel="stylesheet" href="/assets/css/post-toc.css"> <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3184248473087645" crossorigin="anonymous"></script><body><aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end"><header class="profile-wrapper"> <a href="/" id="avatar" class="rounded-circle"><img src="/assets/images/zhgchgli.jpg" width="112" height="112" alt="avatar" onerror="this.style.display='none'"></a> <a class="site-title d-block" href="/">ZhgChgLi (Harry Li)</a><p class="site-subtitle fst-italic mb-0">台湾 🇹🇼 出身の iOS、Web、および自動化分野の開発者。 技術の共有、旅行、執筆活動に積極的に取り組んでいます。</p></header><nav class="flex-column flex-grow-1 w-100 ps-0"><ul class="nav"><li class="nav-item" style="padding:0 15px 0 15px;"> <a href="https://medium.com/@zhgchgli" class="nav-link" target="_blank" style="background:#EDF4FF;color:#0A84FF;font-size:15px;transition:background-color .2s,color .2s;" onmouseover="this.style.backgroundColor='#0A84FF';this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#EDF4FF';this.style.color='#0A84FF';"> <i class="fa-brands fa-medium"></i> <span><span style="font-size: 18px; font-weight: boild;">Follow Me on Medium!</span><br/><u>1,050+</u> Followers</span> </a><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home"></i> <span>ホーム</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream"></i> <span>カテゴリー</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tags"></i> <span>タグ</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive"></i> <span>アーカイブ</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle"></i> <span>このサイトについて</span> </a><li class="nav-item"> <a href="/contact/" class="nav-link"> <i class="fa-fw fa fa-envelope-open"></i> <span>お問い合わせ</span> </a><li class="nav-item"><div aria-label="Language switch" style="display:flex;align-items:center;justify-content:center;gap:5px;"> <a href="https://zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8B%95%E6%AA%A2%E6%9F%A5%E5%A4%9A%E8%AA%9E%E7%B3%BB%E8%88%87%E5%9C%96%E7%89%87%E8%B3%87%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E9%96%8B%E7%99%BC%E6%95%88%E7%8E%87-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid #ccc;background:#f3f3f3;color:#555;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 正體中文 </a> <span style="width:1px;height:18px;background:rgba(0,0,0,.12);"></span> <a href="https://zh-hans.zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8A%A8%E6%A3%80%E6%9F%A5%E5%A4%9A%E8%AF%AD%E7%B3%BB%E4%B8%8E%E5%9B%BE%E7%89%87%E8%B5%84%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E5%BC%80%E5%8F%91%E6%95%88%E7%8E%87-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid #ccc;background:#f3f3f3;color:#555;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 简体中文 </a></div><div aria-label="Language switch" style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:5px;"> <a href="https://en.zhgchg.li/posts/zrealm-dev/swift-run-script-in-xcode-localization-image-asset-checks-automated-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid #ccc;background:#f3f3f3;color:#555;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> English </a> <span style="width:1px;height:18px;background:rgba(0,0,0,.12);"></span> <a href="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid #666;background:#111;color:#fff;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 日本語 </a></div></ul></nav><div class="sidebar-bottom d-flex flex-wrap align-items-center w-100"> <button type="button" class="btn btn-link nav-link" aria-label="Switch Mode" id="mode-toggle"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://link.zhgchg.li" aria-label="link" target="_blank" rel="noopener noreferrer" > <i class="fas fa-link"></i> </a> <a href="https://www.linkedin.com/in/zhgchgli" aria-label="linkedin" target="_blank" rel="noopener noreferrer" > <i class="fab fa-linkedin"></i> </a> <a href="javascript:location.href = 'mailto:' + ['zhgchgli','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></aside><div id="main-wrapper" class="d-flex justify-content-center"><div class="container d-flex flex-column px-xxl-5"><header id="topbar-wrapper" aria-label="Top Bar"><div id="topbar" class="d-flex align-items-center justify-content-between px-lg-3 h-100" ><nav id="breadcrumb" aria-label="Breadcrumb"> <span> <a href="/">ホーム</a> </span> <span>XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出</span></nav><button type="button" id="sidebar-trigger" class="btn btn-link"> <i class="fas fa-bars fa-fw"></i> </button><div id="topbar-title"> 記事</div><button type="button" id="search-trigger" class="btn btn-link"> <i class="fas fa-search fa-fw"></i> </button> <search id="search" class="align-items-center ms-3 ms-lg-0"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="検索..." > </search> <button type="button" class="btn btn-link text-decoration-none" id="search-cancel">キャンセル</button></div></header><div class="row flex-grow-1"><main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4"><article class="px-1" data-toc="true"><header><h1 data-toc-skip>XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出</h1><p class="post-desc fw-light mb-4">Xcodeユーザー向けにSwiftでRun Scriptを作成し、多言語LocalizationとImage Assetsの欠損を自動チェック。手間削減と品質向上を実現する具体的手法を紹介します。</p><div class="post-meta text-muted"> <span> 公開日 <time data-ts="1600358000" data-df="YYYY年M月D日" data-bs-toggle="tooltip" data-bs-placement="bottom" > 2020年09月17日 </time> </span> <span> 更新日 <time data-ts="1712997325" data-df="YYYY年M月D日" data-bs-toggle="tooltip" data-bs-placement="bottom" > 2024年04月13日 </time> </span><div class="mt-3 mb-3"> <a href="/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" class="popup img-link preview-img blur"><img data-src="/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" alt="Preview Image" width="1200" height="630" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNjAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJncmV5Ii8+PC9zdmc+"></a></div><div class="d-flex justify-content-between"> <span style="display: inline-flex; align-items: center; gap: 4px;"> 著者 <em> <a href="https://www.linkedin.com/in/zhgchgli">ZhgChgLi</a> </em> | <em><a href="https://www.linkedin.com/in/zhgchgli" target="_blank">Senior Software Engineer</a></em><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="16" height="16" style="display: block; "><path fill="#007bff" d="M271.2 56C265.1 49.8 256.2 47.3 247.8 49.6C239.4 51.9 232.9 58.4 230.8 66.8L215.5 127C214.4 131.4 209.9 134 205.6 132.7L145.8 115.9C137.4 113.5 128.4 115.9 122.3 122C116.2 128.1 113.8 137.1 116.2 145.5L133.1 205.3C134.3 209.6 131.7 214.1 127.4 215.2L67.1 230.5C58.7 232.6 52.1 239.2 49.8 247.6C47.5 256 50 264.9 56.2 271L100.7 314.3C103.9 317.4 103.9 322.6 100.7 325.8L56.3 369.1C50.1 375.2 47.6 384.1 49.9 392.5C52.2 400.9 58.8 407.4 67.2 409.6L127.4 424.9C131.8 426 134.4 430.5 133.1 434.8L116.2 494.5C113.8 502.9 116.2 511.9 122.3 518C128.4 524.1 137.4 526.5 145.8 524.1L205.6 507.2C209.9 506 214.4 508.6 215.5 512.9L230.8 573.1C232.9 581.5 239.5 588.1 247.9 590.4C256.3 592.7 265.2 590.2 271.3 584L314.6 539.5C317.7 536.3 322.9 536.3 326.1 539.5L369.3 584C375.4 590.2 384.3 592.7 392.7 590.4C401.1 588.1 407.6 581.5 409.8 573.1L425.1 513C426.2 508.6 430.7 506 435 507.3L494.8 524.2C503.2 526.6 512.2 524.2 518.3 518.1C524.4 512 526.8 503 524.4 494.6L507.5 434.8C506.3 430.5 508.9 426 513.2 424.9L573.4 409.6C581.8 407.5 588.4 400.9 590.7 392.5C593 384.1 590.5 375.1 584.3 369.1L539.8 325.8C536.6 322.7 536.6 317.5 539.8 314.3L584.3 271C590.5 264.9 593 256 590.7 247.6C588.4 239.2 581.8 232.7 573.4 230.5L513.2 215.2C508.8 214.1 506.2 209.6 507.5 205.3L524.4 145.5C526.8 137.1 524.4 128.1 518.3 122C512.2 115.9 503.2 113.5 494.8 115.9L435 132.8C430.7 134 426.2 131.4 425.1 127.1L409.8 66.8C407.7 58.4 401.1 51.8 392.7 49.5C384.3 47.2 375.4 49.7 369.3 55.9L326 100.5C322.9 103.7 317.7 103.7 314.5 100.5L271.2 56z"/><path d="M250 330 l60 60 100 -140" stroke="#ffffff" stroke-width="40" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> </span><div> <span class="readtime" data-bs-toggle="tooltip" data-bs-placement="bottom" title="6994 文字" > <em>38 分</em>読了時間</span></div></div></div></header><div id="toc-bar" class="d-flex align-items-center justify-content-between invisible"> <span class="label text-truncate">XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出</span> <button type="button" class="toc-trigger btn me-1"> <i class="fa-solid fa-list-ul fa-fw"></i> </button></div><button id="toc-solo-trigger" type="button" class="toc-trigger btn btn-outline-secondary btn-sm"> <span class="label ps-2 pe-1">目次 🔖</span> <i class="fa-solid fa-angle-right fa-fw"></i> </button> <dialog id="toc-popup" class="p-0"><div class="header d-flex flex-row align-items-center justify-content-between"><div class="label text-truncate py-2 ms-4">XcodeでSwiftを活用｜Run Scriptで多言語と画像資産の欠損を自動検出</div><button id="toc-popup-close" type="button" class="btn mx-1 my-1 opacity-75"> <i class="fas fa-close"></i> </button></div><div id="toc-popup-content" class="px-4 py-3 pb-4"></div></dialog><div class="content"><div aria-label="Language switch" style="display:flex;align-items:center;justify-content:flex-end;"> <a href="https://zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8B%95%E6%AA%A2%E6%9F%A5%E5%A4%9A%E8%AA%9E%E7%B3%BB%E8%88%87%E5%9C%96%E7%89%87%E8%B3%87%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E9%96%8B%E7%99%BC%E6%95%88%E7%8E%87-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.08);color:#dc3545 !important;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 正體中文 </a> <a href="https://zh-hans.zhgchg.li/posts/zrealm-dev/xcode-swift-run-script-%E8%87%AA%E5%8A%A8%E6%A3%80%E6%9F%A5%E5%A4%9A%E8%AF%AD%E7%B3%BB%E4%B8%8E%E5%9B%BE%E7%89%87%E8%B5%84%E6%BA%90%E7%BC%BA%E6%BC%8F%E6%8F%90%E5%8D%87%E5%BC%80%E5%8F%91%E6%95%88%E7%8E%87-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.08);color:#dc3545 !important;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 简体中文 </a> <a href="https://en.zhgchg.li/posts/zrealm-dev/swift-run-script-in-xcode-localization-image-asset-checks-automated-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(220,53,69,.35);background:rgba(220,53,69,.08);color:#dc3545 !important;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> English </a> <a href="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/" style="display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;border:1px solid #dc3545;background:#dc3545;color:#fff !important;font-size:12px;font-weight:600;line-height:1;text-decoration:none;"> 日本語 </a></div><h4 id="zhgchgli-table-of-contents">記事一覧</h4><nav class="zhgchgli-toc"><ul class="zhgchgli-toc-list"><li><a href="#xcodeで直接swiftを使ってshell-scriptを書く">Xcodeで直接Swiftを使ってShell Scriptを書く！</a></li><li><a href="#背景">背景</a></li><li><a href="#期待される機能">期待される機能</a></li><li class="has-children"><details><summary>解決策 <a href="#解決策">#</a></summary><ul><li><a href="#localize--多言語ファイル検査ツール">Localize 🏁 多言語ファイル検査ツール</a></li><li><a href="#ツール-2-asset-checker--画像リソースチェックツール">ツール 2. Asset Checker 👮 画像リソースチェックツール</a></li><li><a href="#自分のツールを開発しよう">自分のツールを開発しよう！</a></li></ul></details></li><li><a href="#まとめ">まとめ</a></li></ul></nav><hr /><h3 id="xcodeで直接swiftを使ってshell-scriptを書く"><span class="me-2">Xcodeで直接Swiftを使ってShell Scriptを書く！</span><a href="#xcodeで直接swiftを使ってshell-scriptを書く" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Localization 多言語および Image Assets の不足チェック導入、Swift で作る Shell Script スクリプト</p><p><a href="/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*RU89TcfRAR5mmclMX9x57w.webp" alt="Photo by [Glenn Carstens-Peters](https://unsplash.com/@glenncarstenspeters?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText){:target=&quot;_blank&quot;}" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9Ijc5OSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iZ3JleSIvPjwvc3ZnPg=="></a></p><p>Photo by <a href="https://unsplash.com/@glenncarstenspeters?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText" target="_blank">Glenn Carstens-Peters</a></p><h3 id="背景"><span class="me-2">背景</span><a href="#背景" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>自分の不注意で、多言語ファイルを編集する際に「;」をよく抜かしてしまい、そのためにアプリのビルド後の言語表示が誤ることがよくあります。さらに開発が進むにつれて言語ファイルがどんどん大きくなり、重複したり使われなくなった文言が混在して非常に混乱しています（画像アセットも同様の状況です）。</p><p>ずっとこの分野の問題を助けるツールを探していました。以前は <a href="https://github.com/igorkulman/iOSLocalizationEditor" target="_blank">iOSLocalizationEditor</a> という Mac アプリを使っていましたが、これは主にローカライズファイルの編集ツールで、ファイルの内容を読み取り編集するもので、自動チェック機能はありませんでした。</p><h3 id="期待される機能"><span class="me-2">期待される機能</span><a href="#期待される機能" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>build 時に多言語のエラー、欠落、重複、Image Assets の欠落を自動でチェックできます。</p><h3 id="解決策"><span class="me-2">解決策</span><a href="#解決策" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>期待する機能を実現するには、Build Phases に Run Script チェックスクリプトを追加する必要があります。</p><p>しかし、チェックスクリプトは shell script で書く必要があり、自分の shell script の習熟度があまり高くなかったため、既存のスクリプトをネットで探してみても完全に期待通りの機能を持つものは見つかりませんでした。諦めかけたときにふと思いつきました：</p><blockquote><p><strong>Shell Script は Swift で書けるんです</strong>！</p></blockquote><p>shell script に比べてより馴染みがあり、習熟度も高いです！この方向で探したところ、既存のツールスクリプトを2つ見つけました！</p><p><a href="https://freshos.github.io/" target="_blank">freshOS</a> チームが作成した2つのチェックツール：</p><ul><li><p><a href="https://github.com/freshOS/Localize" target="_blank"><strong>Localize 🏁</strong></a></p><li><p><a href="https://github.com/s4cha/AssetChecker" target="_blank"><strong>Asset Checker 👮</strong></a></p></ul><p>完全に私たちの期待する機能要件を満たしています！しかも Swift で書かれているので、カスタマイズや改造も簡単です。</p><h4 id="localize--多言語ファイル検査ツール"><span class="me-2"><a href="https://github.com/freshOS/Localize" target="_blank">Localize 🏁</a> 多言語ファイル検査ツール</span><a href="#localize--多言語ファイル検査ツール" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p><strong>機能：</strong></p><ul><li><p>ビルド時に自動でチェック</p><li><p>ローカライズファイルの自動整形と整理</p><li><p>多言語および主要言語の欠落や余分な部分のチェック</p><li><p>多言語の重複文のチェック</p><li><p>多言語の未翻訳文のチェック</p><li><p>多言語で未使用の文言のチェック</p></ul><p><strong>インストール方法：</strong></p><ol><li><p><a href="https://github.com/freshOS/Localize/blob/master/Localize.swift" target="_blank">ツールの Swift スクリプトファイルをダウンロード</a></p><li><p>プロジェクトディレクトリに配置します 例: <code class="language-plaintext highlighter-rouge">${SRCROOT}/Localize.swift</code></p><li><p>プロジェクト設定を開く → iOSターゲット → Build Phases → 左上の「+」 → New Run Script Phase → スクリプト内容にパスを貼り付け EX: <code class="language-plaintext highlighter-rouge">${SRCROOT}/Localize.swift</code></p></ol><p><a href="/assets/41c49a75a743/1*k2OHjrcQaQIWLqV7G57TgA.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*k2OHjrcQaQIWLqV7G57TgA.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQwNyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iZ3JleSIvPjwvc3ZnPg=="></a></p><ol><li>Xcodeで <code class="language-plaintext highlighter-rouge">Localize.swift</code> ファイルを開いて設定を編集します。ファイルの上部に変更可能な設定項目が表示されます：</ol><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+</pre><td class="rouge-code"><pre><span class="c1">// チェックスクリプトを有効にする</span>
+<span class="k">let</span> <span class="nv">enabled</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1">// ローカライズファイルのディレクトリ</span>
+<span class="k">let</span> <span class="nv">relativeLocalizableFolders</span> <span class="o">=</span> <span class="s">"/Resources/Languages"</span>
+
+<span class="c1">// プロジェクトディレクトリ（コード内でキーが使われているかを検索するため）</span>
+<span class="k">let</span> <span class="nv">relativeSourceFolder</span> <span class="o">=</span> <span class="s">"/Sources"</span>
+
+<span class="c1">// コード内の NSLocalized ローカライズファイルの正規表現パターン</span>
+<span class="c1">// 追加可能、変更不要</span>
+<span class="k">let</span> <span class="nv">patterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">"NSLocalized(Format)?String</span><span class="se">\\</span><span class="s">(</span><span class="se">\\</span><span class="s">s*@?</span><span class="se">\"</span><span class="s">([</span><span class="se">\\</span><span class="s">w</span><span class="se">\\</span><span class="s">.]+)</span><span class="se">\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// Swift と Objc ネイティブ</span>
+    <span class="s">"Localizations</span><span class="se">\\</span><span class="s">.((?:[A-Z]{1}[a-z]*[A-z]*)*(?:</span><span class="se">\\</span><span class="s">.[A-Z]{1}[a-z]*[A-z]*)*)"</span><span class="p">,</span> <span class="c1">// Laurine 呼び出し</span>
+    <span class="s">"L10n.tr</span><span class="se">\\</span><span class="s">(key: </span><span class="se">\"</span><span class="s">(</span><span class="se">\\</span><span class="s">w+)</span><span class="se">\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// SwiftGen 生成</span>
+    <span class="s">"ypLocalized</span><span class="se">\\</span><span class="s">(</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"\\</span><span class="s">)"</span><span class="p">,</span>
+    <span class="s">"</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"</span><span class="s">.localized"</span> <span class="c1">// "key".localized パターン</span>
+<span class="p">]</span>
+
+<span class="c1">// 「未使用のキー警告」を無視するキー</span>
+<span class="k">let</span> <span class="nv">ignoredFromUnusedKeys</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="cm">/* 例
+let ignoredFromUnusedKeys = [
+    "NotificationNoOne",
+    "NotificationCommentPhoto",
+    "NotificationCommentHisPhoto",
+    "NotificationCommentHerPhoto"
+]
+*/</span>
+
+<span class="c1">// メイン言語</span>
+<span class="k">let</span> <span class="nv">masterLanguage</span> <span class="o">=</span> <span class="s">"en"</span>
+
+<span class="c1">// ファイルを a-z ソート・整理を有効にする</span>
+<span class="k">let</span> <span class="nv">sanitizeFiles</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="c1">// プロジェクトが単一言語か多言語か</span>
+<span class="k">let</span> <span class="nv">singleLanguage</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="c1">// 未翻訳キーのチェックを有効にする</span>
+<span class="k">let</span> <span class="nv">checkForUntranslated</span> <span class="o">=</span> <span class="kc">true</span>
+</pre></table></code></div></div><ol><li>ビルド！成功！</ol><p><a href="/assets/41c49a75a743/1*74osParg9RRi2gcRx9ELuw.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*74osParg9RRi2gcRx9ELuw.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjQiIGhlaWdodD0iNDA0Ij48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJncmV5Ii8+PC9zdmc+"></a></p><p><strong>チェック結果のメッセージタイプ：</strong></p><ul><li><strong>Build Error</strong> ❌ <strong>：</strong><ul><li>[Duplication] ローカライズファイル内で項目が重複しています<li>[Unused Key] ローカライズファイルに定義されている項目がコード内で使用されていません<li>[Missing] ローカライズファイルに定義されていない項目がコード内で使用されています<li>[Redundant] このローカライズファイルの項目はメインのローカライズファイルに比べて余分です<li>[Missing Translation] 項目はメインのローカライズファイルにありますが、このローカライズファイルには欠けています</ul><li><strong>Build Warning</strong> ⚠️ <strong>：</strong><ul><li>[Potentially Untranslated] この項目は翻訳されていません（メイン言語ファイルの内容と同じです）</ul></ul><blockquote><p><strong><em>まだ完了していません。現在は自動チェックの通知が表示されますが、さらに自分でカスタマイズする必要があります。</em></strong></p></blockquote><p><strong>カスタムマッチ正規表現：</strong></p><p><code class="language-plaintext highlighter-rouge">Localize.swift</code> の先頭設定ブロック patterns 部分の最初の項目を振り返ってみましょう：</p><p><code class="language-plaintext highlighter-rouge">"NSLocalized(Format)?String\\(\\s*@?\"([\\w\\.]+)\""</code></p><p>Swift/ObjCの <code class="language-plaintext highlighter-rouge">NSLocalizedString()</code> メソッドにマッチします。この正規表現は <code class="language-plaintext highlighter-rouge">"Home.Title"</code> のような形式の文だけにマッチします。完全な文章やフォーマットパラメータ付きの場合は、誤って[Unused Key]と判断されます。</p><p>EX: <code class="language-plaintext highlighter-rouge">"Hi, %@ welcome to my app"、"Hello World!"</code> <strong>← これらの文はマッチしません</strong></p><p>patterns の設定を新たに追加するか、既存の patterns を次のように変更できます：</p><p><code class="language-plaintext highlighter-rouge">"NSLocalized(Format)?String\\(\\s*@?\"([^(\")]+)\""</code></p><p>主に <code class="language-plaintext highlighter-rouge">NSLocalizedString</code> メソッドの後のマッチング文を調整し、任意の文字列を <code class="language-plaintext highlighter-rouge">"</code> が出現するまで取得するようにしました。ご自身のニーズに合わせて、<a href="https://rubular.com/r/5eXvGy3svsAHyT" target="_blank">こちら</a>からカスタマイズも可能です。</p><p><strong>多言語ファイルのフォーマットチェック機能を追加：</strong></p><p>このスクリプトは言語ファイルの内容対応チェックのみを行い、ファイル形式の正確さ（「<strong>;</strong>」を忘れていないかなど）はチェックしません。必要な場合はご自身で追加してください！</p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+</pre><td class="rouge-code"><pre><span class="c1">//....</span>
+<span class="k">let</span> <span class="nv">formatResult</span> <span class="o">=</span> <span class="nf">shell</span><span class="p">(</span><span class="s">"plutil -lint </span><span class="se">\(</span><span class="n">location</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="k">guard</span> <span class="n">formatResult</span><span class="o">.</span><span class="nf">trimmingCharacters</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">.</span><span class="n">whitespacesAndNewlines</span><span class="p">)</span><span class="o">.</span><span class="nf">suffix</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="s">"OK"</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">let</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj"</span>
+            <span class="o">+</span> <span class="s">"/Localizable.strings:1: "</span>
+            <span class="o">+</span> <span class="s">"error: [File Invaild] "</span>
+            <span class="o">+</span> <span class="s">"この Localizable.strings ファイルのフォーマットが無効です。"</span>
+  <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+  <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="k">return</span>
+<span class="p">}</span>
+<span class="c1">//....</span>
+
+<span class="kd">func</span> <span class="nf">shell</span><span class="p">(</span><span class="n">_</span> <span class="nv">command</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">task</span> <span class="o">=</span> <span class="kt">Process</span><span class="p">()</span>
+    <span class="k">let</span> <span class="nv">pipe</span> <span class="o">=</span> <span class="kt">Pipe</span><span class="p">()</span>
+
+    <span class="n">task</span><span class="o">.</span><span class="n">standardOutput</span> <span class="o">=</span> <span class="n">pipe</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span><span class="s">"-c"</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">launchPath</span> <span class="o">=</span> <span class="s">"/bin/bash"</span>
+    <span class="n">task</span><span class="o">.</span><span class="nf">launch</span><span class="p">()</span>
+
+    <span class="k">let</span> <span class="nv">data</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fileHandleForReading</span><span class="o">.</span><span class="nf">readDataToEndOfFile</span><span class="p">()</span>
+    <span class="k">let</span> <span class="nv">output</span> <span class="o">=</span> <span class="kt">String</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span><span class="o">!</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">shell()</code> を追加してシェルスクリプトを実行し、<code class="language-plaintext highlighter-rouge">plutil -lint</code> を使って plist のローカライズファイルのフォーマット正確性をチェックします。エラーや「;」の不足がある場合はエラーを返し、問題なければ <code class="language-plaintext highlighter-rouge">OK</code> を返して判定します！</p><p>チェック箇所は LocalizationFiles-&gt;process() -&gt; <code class="language-plaintext highlighter-rouge">let location = singleLanguage…</code> の後、約135行目あたりに追加できます。または、最後に提供する完全改造版を参照してください。</p><p><strong>その他のカスタマイズ：</strong></p><p>私たちは自分のニーズに合わせてカスタマイズできます。例えば、error を warning に変更したり、特定のチェック機能（例：Potentially Untranslated、Unused Key）を無効にしたりできます。スクリプトは Swift なので、慣れている私たちには安心して変更できます！間違って壊す心配もありません！</p><p>ビルド時にエラー❌を出すには：</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>print("Projectファイル.lproj" + "/ファイル:行: " + "error: エラーメッセージ")
+</pre></table></code></div></div><p>build 時に Warning ⚠️ を表示させるには：</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>print("Projectファイル.lproj" + "/ファイル:行: " + "warning: 警告メッセージ")
+</pre></table></code></div></div><p><strong>最終魔改版：</strong></p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+</pre><td class="rouge-code"><pre><span class="cp">#!/usr/bin/env xcrun --sdk macosx swift</span>
+
+<span class="kd">import</span> <span class="kt">Foundation</span>
+
+<span class="c1">// WHAT</span>
+<span class="c1">// 1. 他のローカライズファイルで欠落しているキーを検出する</span>
+<span class="c1">// 2. 未翻訳の可能性があるキーを検出する</span>
+<span class="c1">// 3. 重複しているキーを検出する</span>
+<span class="c1">// 4. 未使用のキーを検出し、一括削除用のスクリプトを生成する</span>
+
+<span class="c1">// MARK: Start Of Configurable Section</span>
+
+<span class="cm">/*
+ スクリプトを有効または無効にできます
+ */</span>
+<span class="k">let</span> <span class="nv">enabled</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="cm">/*
+ パスをここに記入してください。例 -&gt;  Resources/Localizations/Languages
+ */</span>
+<span class="k">let</span> <span class="nv">relativeLocalizableFolders</span> <span class="o">=</span> <span class="s">"/streetvoice/SupportingFiles"</span>
+
+<span class="cm">/*
+ プロジェクト内で実際に使用しているローカライズキーを検索するためのソースフォルダのパスです
+ */</span>
+<span class="k">let</span> <span class="nv">relativeSourceFolder</span> <span class="o">=</span> <span class="s">"/streetvoice"</span>
+
+<span class="cm">/*
+ ローカライズを認識するための正規表現パターンです。
+ */</span>
+<span class="k">let</span> <span class="nv">patterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">"NSLocalized(Format)?String</span><span class="se">\\</span><span class="s">(</span><span class="se">\\</span><span class="s">s*@?</span><span class="se">\"</span><span class="s">([^(</span><span class="se">\"</span><span class="s">)]+)</span><span class="se">\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// Swift と Objc ネイティブ</span>
+    <span class="s">"Localizations</span><span class="se">\\</span><span class="s">.((?:[A-Z]{1}[a-z]*[A-z]*)*(?:</span><span class="se">\\</span><span class="s">.[A-Z]{1}[a-z]*[A-z]*)*)"</span><span class="p">,</span> <span class="c1">// Laurine 呼び出し</span>
+    <span class="s">"L10n.tr</span><span class="se">\\</span><span class="s">(key: </span><span class="se">\"</span><span class="s">(</span><span class="se">\\</span><span class="s">w+)</span><span class="se">\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// SwiftGen 生成</span>
+    <span class="s">"ypLocalized</span><span class="se">\\</span><span class="s">(</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"\\</span><span class="s">)"</span><span class="p">,</span>
+    <span class="s">"</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"</span><span class="s">.localized"</span> <span class="c1">// "key".localized パターン</span>
+<span class="p">]</span>
+
+<span class="cm">/*
+ "未使用" と認識したくないキーです
+ 例えば、連結して使うキーは解析で検出されないため、
+ 誤検知を防ぐためにここに追加してください :)
+ */</span>
+<span class="k">let</span> <span class="nv">ignoredFromUnusedKeys</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="cm">/* 例
+let ignoredFromUnusedKeys = [
+    "NotificationNoOne",
+    "NotificationCommentPhoto",
+    "NotificationCommentHisPhoto",
+    "NotificationCommentHerPhoto"
+]
+*/</span>
+
+<span class="k">let</span> <span class="nv">masterLanguage</span> <span class="o">=</span> <span class="s">"base"</span>
+
+<span class="cm">/*
+ ファイルのサニタイズはコメントや空行を削除し、
+ キーをアルファベット順に並べ替えます。
+ */</span>
+<span class="k">let</span> <span class="nv">sanitizeFiles</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="cm">/*
+ 複数言語があるかどうかを判定します。
+ */</span>
+<span class="k">let</span> <span class="nv">singleLanguage</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="cm">/*
+ アプリ内に存在するがマスター翻訳にないキーがある場合にエラーを表示するかどうか
+ */</span>
+<span class="k">let</span> <span class="nv">checkForUntranslated</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="c1">// MARK: End Of Configurable Section</span>
+
+<span class="k">if</span> <span class="n">enabled</span> <span class="o">==</span> <span class="kc">false</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Localization check cancelled"</span><span class="p">)</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mo">000</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// 対応言語のリストを自動検出</span>
+<span class="kd">func</span> <span class="nf">listSupportedLanguages</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">sl</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">let</span> <span class="nv">path</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="n">currentDirectoryPath</span> <span class="o">+</span> <span class="n">relativeLocalizableFolders</span>
+    <span class="k">if</span> <span class="o">!</span><span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="nf">fileExists</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span> <span class="n">path</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Invalid configuration: </span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s"> does not exist."</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">let</span> <span class="nv">enumerator</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="nf">enumerator</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">extensionName</span> <span class="o">=</span> <span class="s">"lproj"</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Found these languages:"</span><span class="p">)</span>
+    <span class="k">while</span> <span class="k">let</span> <span class="nv">element</span> <span class="o">=</span> <span class="n">enumerator</span><span class="p">?</span><span class="o">.</span><span class="nf">nextObject</span><span class="p">()</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="n">extensionName</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">let</span> <span class="nv">name</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="nf">replacingOccurrences</span><span class="p">(</span><span class="nv">of</span><span class="p">:</span> <span class="s">".</span><span class="se">\(</span><span class="n">extensionName</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+            <span class="n">sl</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">sl</span>
+<span class="p">}</span>
+
+<span class="k">let</span> <span class="nv">supportedLanguages</span> <span class="o">=</span> <span class="nf">listSupportedLanguages</span><span class="p">()</span>
+<span class="k">var</span> <span class="nv">ignoredFromSameTranslation</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[:]</span>
+<span class="k">let</span> <span class="nv">path</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="n">currentDirectoryPath</span> <span class="o">+</span> <span class="n">relativeLocalizableFolders</span>
+<span class="k">var</span> <span class="nv">numberOfWarnings</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">var</span> <span class="nv">numberOfErrors</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="kd">struct</span> <span class="kt">LocalizationFiles</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">name</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="k">var</span> <span class="nv">keyValue</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[:]</span>
+    <span class="k">var</span> <span class="nv">linesNumbers</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[:]</span>
+
+    <span class="nf">init</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="nf">process</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">process</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">sanitizeFiles</span> <span class="p">{</span>
+            <span class="nf">removeCommentsFromFile</span><span class="p">()</span>
+            <span class="nf">removeEmptyLinesFromFile</span><span class="p">()</span>
+            <span class="nf">sortLinesAlphabetically</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">let</span> <span class="nv">location</span> <span class="o">=</span> <span class="n">singleLanguage</span> <span class="p">?</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/Localizable.strings"</span> <span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings"</span>
+        
+        <span class="k">let</span> <span class="nv">formatResult</span> <span class="o">=</span> <span class="nf">shell</span><span class="p">(</span><span class="s">"plutil -lint </span><span class="se">\(</span><span class="n">location</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+        <span class="k">guard</span> <span class="n">formatResult</span><span class="o">.</span><span class="nf">trimmingCharacters</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">.</span><span class="n">whitespacesAndNewlines</span><span class="p">)</span><span class="o">.</span><span class="nf">suffix</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="s">"OK"</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj"</span>
+                <span class="o">+</span> <span class="s">"/Localizable.strings:1: "</span>
+                <span class="o">+</span> <span class="s">"error: [File Invaild] "</span>
+                <span class="o">+</span> <span class="s">"この Localizable.strings ファイルの形式が無効です。"</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+            <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+        
+        <span class="k">guard</span> <span class="k">let</span> <span class="nv">string</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+
+        <span class="k">let</span> <span class="nv">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="nf">components</span><span class="p">(</span><span class="nv">separatedBy</span><span class="p">:</span> <span class="o">.</span><span class="n">newlines</span><span class="p">)</span>
+        <span class="n">keyValue</span> <span class="o">=</span> <span class="p">[:]</span>
+
+        <span class="k">let</span> <span class="nv">pattern</span> <span class="o">=</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"</span><span class="s"> = </span><span class="se">\"</span><span class="s">(.+)</span><span class="se">\"</span><span class="s">;"</span>
+        <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="n">pattern</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span>
+        <span class="k">var</span> <span class="nv">ignoredTranslation</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">lineNumber</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="k">in</span> <span class="n">lines</span><span class="o">.</span><span class="nf">enumerated</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="kt">NSRange</span><span class="p">(</span><span class="nv">location</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">length</span><span class="p">:</span> <span class="p">(</span><span class="n">line</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+
+            <span class="c1">// 無視するパターン</span>
+            <span class="k">let</span> <span class="nv">ignoredPattern</span> <span class="o">=</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.*)</span><span class="se">\"</span><span class="s"> = </span><span class="se">\"</span><span class="s">(.+)</span><span class="se">\"</span><span class="s">; *</span><span class="se">\\</span><span class="s">/</span><span class="se">\\</span><span class="s">/ *ignore-same-translation-warning"</span>
+            <span class="k">let</span> <span class="nv">ignoredRegex</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="n">ignoredPattern</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">ignoredMatch</span> <span class="o">=</span> <span class="n">ignoredRegex</span><span class="p">?</span><span class="o">.</span><span class="nf">firstMatch</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="n">line</span><span class="p">,</span>
+                                                           <span class="nv">options</span><span class="p">:</span> <span class="p">[],</span>
+                                                           <span class="nv">range</span><span class="p">:</span> <span class="n">range</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">ignoredMatch</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">ignoredTranslation</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">firstMatch</span> <span class="o">=</span> <span class="n">regex</span><span class="p">?</span><span class="o">.</span><span class="nf">firstMatch</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="n">line</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[],</span> <span class="nv">range</span><span class="p">:</span> <span class="n">range</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">firstMatch</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">firstMatch</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="mi">2</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">keyValue</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+                    <span class="k">let</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj"</span>
+                        <span class="o">+</span> <span class="s">"/Localizable.strings:</span><span class="se">\(</span><span class="n">linesNumbers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">!</span><span class="se">)</span><span class="s">: "</span>
+                        <span class="o">+</span> <span class="s">"error: [Duplication] </span><span class="se">\"\(</span><span class="n">key</span><span class="se">)\"</span><span class="s"> "</span>
+                        <span class="o">+</span> <span class="s">"</span><span class="se">\(</span><span class="n">name</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span><span class="se">)</span><span class="s"> ファイルで重複しています"</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+                    <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="n">keyValue</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="n">linesNumbers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">lineNumber</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">ignoredFromSameTranslation</span><span class="p">)</span>
+        <span class="n">ignoredFromSameTranslation</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignoredTranslation</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">rebuildFileString</span><span class="p">(</span><span class="n">from</span> <span class="nv">lines</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">lines</span><span class="o">.</span><span class="nf">reduce</span><span class="p">(</span><span class="s">""</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="nv">r</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">s</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="nf">in</span>
+            <span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="s">""</span><span class="p">)</span> <span class="p">?</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span> <span class="p">:</span> <span class="p">(</span><span class="n">r</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">removeEmptyLinesFromFile</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">location</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings"</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">string</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="nv">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="nf">components</span><span class="p">(</span><span class="nv">separatedBy</span><span class="p">:</span> <span class="o">.</span><span class="n">newlines</span><span class="p">)</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">trimmingCharacters</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">.</span><span class="n">whitespaces</span><span class="p">)</span> <span class="o">!=</span> <span class="s">""</span> <span class="p">}</span>
+            <span class="k">let</span> <span class="nv">s</span> <span class="o">=</span> <span class="nf">rebuildFileString</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="n">lines</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">?</span> <span class="n">s</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">toFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">atomically</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">removeCommentsFromFile</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">location</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings"</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">string</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="nv">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="nf">components</span><span class="p">(</span><span class="nv">separatedBy</span><span class="p">:</span> <span class="o">.</span><span class="n">newlines</span><span class="p">)</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="o">!</span><span class="nv">$0</span><span class="o">.</span><span class="nf">hasPrefix</span><span class="p">(</span><span class="s">"//"</span><span class="p">)</span> <span class="p">}</span>
+            <span class="k">let</span> <span class="nv">s</span> <span class="o">=</span> <span class="nf">rebuildFileString</span><span class="p">(</span><span class="nv">from</span><span class="p">:</span> <span class="n">lines</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">?</span> <span class="n">s</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">toFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">atomically</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">sortLinesAlphabetically</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">location</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings"</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">string</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="nv">lines</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="nf">components</span><span class="p">(</span><span class="nv">separatedBy</span><span class="p">:</span> <span class="o">.</span><span class="n">newlines</span><span class="p">)</span>
+
+            <span class="k">var</span> <span class="nv">s</span> <span class="o">=</span> <span class="s">""</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="k">in</span> <span class="nf">sortAlphabetically</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">.</span><span class="nf">enumerated</span><span class="p">()</span> <span class="p">{</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="n">l</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">lines</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">{</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">try</span><span class="p">?</span> <span class="n">s</span><span class="o">.</span><span class="nf">write</span><span class="p">(</span><span class="nv">toFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">atomically</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">removeEmptyLinesFromLines</span><span class="p">(</span><span class="n">_</span> <span class="nv">lines</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">lines</span><span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">trimmingCharacters</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="o">.</span><span class="n">whitespaces</span><span class="p">)</span> <span class="o">!=</span> <span class="s">""</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">func</span> <span class="nf">sortAlphabetically</span><span class="p">(</span><span class="n">_</span> <span class="nv">lines</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">lines</span><span class="o">.</span><span class="nf">sorted</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// MARK: - メモリ内にローカライズファイルを読み込む</span>
+
+<span class="k">let</span> <span class="nv">masterLocalizationFile</span> <span class="o">=</span> <span class="kt">LocalizationFiles</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="n">masterLanguage</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">localizationFiles</span> <span class="o">=</span> <span class="n">supportedLanguages</span>
+    <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span> <span class="o">!=</span> <span class="n">masterLanguage</span> <span class="p">}</span>
+    <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="kt">LocalizationFiles</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="c1">// MARK: - 未使用キーを検出</span>
+
+<span class="k">let</span> <span class="nv">sourcesPath</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="n">currentDirectoryPath</span> <span class="o">+</span> <span class="n">relativeSourceFolder</span>
+<span class="k">let</span> <span class="nv">fileManager</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span>
+<span class="k">let</span> <span class="nv">enumerator</span> <span class="o">=</span> <span class="n">fileManager</span><span class="o">.</span><span class="nf">enumerator</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span> <span class="n">sourcesPath</span><span class="p">)</span>
+<span class="k">var</span> <span class="nv">localizedStrings</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="k">let</span> <span class="nv">swiftFileLocation</span> <span class="o">=</span> <span class="n">enumerator</span><span class="p">?</span><span class="o">.</span><span class="nf">nextObject</span><span class="p">()</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="c1">// 拡張子をチェック</span>
+    <span class="k">if</span> <span class="n">swiftFileLocation</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".swift"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="n">swiftFileLocation</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".m"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="n">swiftFileLocation</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".mm"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">location</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">sourcesPath</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">swiftFileLocation</span><span class="se">)</span><span class="s">"</span>
+        <span class="k">if</span> <span class="k">let</span> <span class="nv">string</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="k">in</span> <span class="n">patterns</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span>
+                <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="kt">NSRange</span><span class="p">(</span><span class="nv">location</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">length</span><span class="p">:</span> <span class="p">(</span><span class="n">string</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="n">length</span><span class="p">)</span> <span class="c1">// Obj c 用</span>
+                <span class="n">regex</span><span class="p">?</span><span class="o">.</span><span class="nf">enumerateMatches</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="n">string</span><span class="p">,</span>
+                                        <span class="nv">options</span><span class="p">:</span> <span class="p">[],</span>
+                                        <span class="nv">range</span><span class="p">:</span> <span class="n">range</span><span class="p">,</span>
+                                        <span class="nv">using</span><span class="p">:</span> <span class="p">{</span> <span class="n">result</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="k">in</span>
+                                            <span class="k">if</span> <span class="k">let</span> <span class="nv">r</span> <span class="o">=</span> <span class="n">result</span> <span class="p">{</span>
+                                                <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">string</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">numberOfRanges</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                                                <span class="n">localizedStrings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                                            <span class="p">}</span>
+                <span class="p">})</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">var</span> <span class="nv">masterKeys</span> <span class="o">=</span> <span class="kt">Set</span><span class="p">(</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">keyValue</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">usedKeys</span> <span class="o">=</span> <span class="kt">Set</span><span class="p">(</span><span class="n">localizedStrings</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">ignored</span> <span class="o">=</span> <span class="kt">Set</span><span class="p">(</span><span class="n">ignoredFromUnusedKeys</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">unused</span> <span class="o">=</span> <span class="n">masterKeys</span><span class="o">.</span><span class="nf">subtracting</span><span class="p">(</span><span class="n">usedKeys</span><span class="p">)</span><span class="o">.</span><span class="nf">subtracting</span><span class="p">(</span><span class="n">ignored</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">untranslated</span> <span class="o">=</span> <span class="n">usedKeys</span><span class="o">.</span><span class="nf">subtracting</span><span class="p">(</span><span class="n">masterKeys</span><span class="p">)</span>
+
+<span class="c1">// ここで未使用キーを一括削除するためのXcode正規表現の置換スクリプトを生成！</span>
+<span class="k">var</span> <span class="nv">replaceCommand</span> <span class="o">=</span> <span class="s">"</span><span class="se">\"</span><span class="s">("</span>
+<span class="k">var</span> <span class="nv">counter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">v</span> <span class="k">in</span> <span class="n">unused</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings:</span><span class="se">\(</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">linesNumbers</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">!</span><span class="se">)</span><span class="s">: "</span>
+    <span class="n">str</span> <span class="o">+=</span> <span class="s">"error: [Unused Key] </span><span class="se">\"\(</span><span class="n">v</span><span class="se">)\"</span><span class="s"> は一度も使用されていません"</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+    <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">counter</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="n">replaceCommand</span> <span class="o">+=</span> <span class="s">"</span><span class="se">\\</span><span class="s">|"</span>
+    <span class="p">}</span>
+    <span class="n">replaceCommand</span> <span class="o">+=</span> <span class="n">v</span>
+    <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="n">unused</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">{</span>
+        <span class="n">replaceCommand</span> <span class="o">+=</span> <span class="s">")</span><span class="se">\"</span><span class="s"> = </span><span class="se">\"</span><span class="s">.*</span><span class="se">\"</span><span class="s">;"</span>
+    <span class="p">}</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">replaceCommand</span><span class="p">)</span>
+
+<span class="c1">// MARK: - 各翻訳ファイルをマスター(en)と比較</span>
+
+<span class="k">for</span> <span class="n">file</span> <span class="k">in</span> <span class="n">localizationFiles</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="k">in</span> <span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">keyValue</span><span class="o">.</span><span class="n">keys</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">keyValue</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+            <span class="k">var</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings:</span><span class="se">\(</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">linesNumbers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!</span><span class="se">)</span><span class="s">: "</span>
+            <span class="n">str</span> <span class="o">+=</span> <span class="s">"error: [Missing] </span><span class="se">\"\(</span><span class="n">k</span><span class="se">)\"</span><span class="s"> が </span><span class="se">\(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span><span class="se">)</span><span class="s"> ファイルにありません"</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+            <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">let</span> <span class="nv">redundantKeys</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">keyValue</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="o">!</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">keyValue</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="nv">$0</span><span class="p">)</span> <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="k">in</span> <span class="n">redundantKeys</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings:</span><span class="se">\(</span><span class="n">file</span><span class="o">.</span><span class="n">linesNumbers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!</span><span class="se">)</span><span class="s">: "</span>
+            <span class="o">+</span> <span class="s">"error: [Redundant key] </span><span class="se">\"\(</span><span class="n">k</span><span class="se">)\"</span><span class="s"> は </span><span class="se">\(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span><span class="se">)</span><span class="s"> ファイルで冗長です"</span>
+
+        <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="n">checkForUntranslated</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="k">in</span> <span class="n">untranslated</span> <span class="p">{</span>
+        <span class="k">var</span> <span class="nv">str</span> <span class="o">=</span> <span class="s">"</span><span class="se">\(</span><span class="n">path</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="n">masterLocalizationFile</span><span class="o">.</span><span class="n">name</span><span class="se">)</span><span class="s">.lproj/Localizable.strings:1: "</span>
+        <span class="n">str</span> <span class="o">+=</span> <span class="s">"error: [Missing Translation] </span><span class="se">\(</span><span class="n">key</span><span class="se">)</span><span class="s"> は翻訳されていません"</span>
+
+        <span class="nf">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span>
+        <span class="n">numberOfErrors</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="s">"警告の数 : </span><span class="se">\(</span><span class="n">numberOfWarnings</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"エラーの数 : </span><span class="se">\(</span><span class="n">numberOfErrors</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">numberOfErrors</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">shell</span><span class="p">(</span><span class="n">_</span> <span class="nv">command</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">task</span> <span class="o">=</span> <span class="kt">Process</span><span class="p">()</span>
+    <span class="k">let</span> <span class="nv">pipe</span> <span class="o">=</span> <span class="kt">Pipe</span><span class="p">()</span>
+
+    <span class="n">task</span><span class="o">.</span><span class="n">standardOutput</span> <span class="o">=</span> <span class="n">pipe</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span><span class="s">"-c"</span><span class="p">,</span> <span class="n">command</span><span class="p">]</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">launchPath</span> <span class="o">=</span> <span class="s">"/bin/bash"</span>
+    <span class="n">task</span><span class="o">.</span><span class="nf">launch</span><span class="p">()</span>
+
+    <span class="k">let</span> <span class="nv">data</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">fileHandleForReading</span><span class="o">.</span><span class="nf">readDataToEndOfFile</span><span class="p">()</span>
+    <span class="k">let</span> <span class="nv">output</span> <span class="o">=</span> <span class="kt">String</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)</span><span class="o">!</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+<span class="p">}</span>
+</pre></table></code></div></div><blockquote><p><strong><em>最後最後、まだ終わっていません！</em></strong></p></blockquote><p>私たちの Swift チェックツールスクリプトの調整が完了したら、<strong>コンパイルして実行ファイルにすることでビルド時間を短縮</strong>しましょう。そうしないと、毎回ビルド時に再コンパイルが発生し（約90%の時間を削減可能）、時間がかかります。</p><p>ターミナルを開き、プロジェクト内のチェックツールスクリプトがあるディレクトリに移動して実行してください：</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>swiftc <span class="nt">-o</span> Localize Localize.swift
+</pre></table></code></div></div><p><a href="/assets/41c49a75a743/1*rwq_KZIDW-Lvtpd2xmgjDw.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*rwq_KZIDW-Lvtpd2xmgjDw.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NzIiIGhlaWdodD0iNTkiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9ImdyZXkiLz48L3N2Zz4="></a></p><p><a href="/assets/41c49a75a743/1*BCKtqshZxHH17j3nBGtNlg.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*BCKtqshZxHH17j3nBGtNlg.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MiIgaGVpZ2h0PSIxMDAiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9ImdyZXkiLz48L3N2Zz4="></a></p><p>そして Build Phases に戻り、Script の内容のパスを実行ファイルに変更します。</p><p>EX: <code class="language-plaintext highlighter-rouge">${SRCROOT}/Localize</code></p><p><a href="/assets/41c49a75a743/1*ewhCXzXNuS0MCTMCuINWng.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*ewhCXzXNuS0MCTMCuINWng.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NjAiIGhlaWdodD0iMjczIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJncmV5Ii8+PC9zdmc+"></a></p><p><strong>完了！</strong></p><h4 id="ツール-2-asset-checker--画像リソースチェックツール"><span class="me-2">ツール 2. <a href="https://github.com/s4cha/AssetChecker" target="_blank"><strong>Asset Checker 👮</strong></a> <strong>画像リソースチェックツール</strong></span><a href="#ツール-2-asset-checker--画像リソースチェックツール" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p><strong>機能：</strong></p><ul><li><p>build 時に自動でチェック</p><li><p>画像の欠落チェック：名前は呼び出されているが、画像リソースディレクトリに存在しないもの</p><li><p>画像の余分：名前は未使用だが、画像リソースディレクトリに存在するもの</p></ul><p><strong>インストール方法：</strong></p><ol><li><p><a href="https://github.com/freshOS/AssetChecker/blob/master/Classes/main.swift" target="_blank">ツールの Swift スクリプトファイルをダウンロード</a></p><li><p>プロジェクトディレクトリに配置します 例: <code class="language-plaintext highlighter-rouge">${SRCROOT}/AssetChecker.swift</code></p><li><p>プロジェクト設定を開く → iOSターゲット → Build Phases → 左上の「+」 → New Run Script Phase → スクリプト内容にパスを貼り付ける</p></ol><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/AssetChecker.swift <span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/專案目錄 <span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/Resources/Images.xcassets
+//<span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/Resources/Images.xcassets <span class="o">=</span> あなたの .xcassets の場所
+</pre></table></code></div></div><p><a href="/assets/41c49a75a743/1*TPLS60W1iQiGFzU-inf3aA.webp" class="popup img-link blur"><img data-src="/assets/41c49a75a743/1*TPLS60W1iQiGFzU-inf3aA.webp" alt="" data-lqip="true" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDY1IiBoZWlnaHQ9IjMzNCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iZ3JleSIvPjwvc3ZnPg=="></a></p><p>パラメータを直接パスに渡すことができます。パラメータ1：プロジェクトディレクトリの場所、パラメータ2：画像リソースディレクトリの場所；または多言語チェックツールと同様に <code class="language-plaintext highlighter-rouge">AssetChecker.swift</code> の先頭のパラメータ設定ブロックを編集してください：</p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="c1">// 設定してください \o/</span>
+
+<span class="c1">// プロジェクトディレクトリの場所（画像がコード内で使用されているか検索するため）</span>
+<span class="k">var</span> <span class="nv">sourcePathOption</span><span class="p">:</span><span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
+
+<span class="c1">// .xcassets ディレクトリの場所</span>
+<span class="k">var</span> <span class="nv">assetCatalogPathOption</span><span class="p">:</span><span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
+
+<span class="c1">// 未使用の警告を無視する項目</span>
+<span class="k">let</span> <span class="nv">ignoredUnusedNames</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+</pre></table></code></div></div><ol><li>ビルド！成功！</ol><p><strong>チェック結果のメッセージタイプ：</strong></p><ul><li><strong>Build Error</strong> ❌ <strong>：</strong><ul><li>[Asset Missing] プログラム内で呼び出されているが、画像リソースフォルダに存在しない項目</ul><li><strong>Build Warning</strong> ⚠️ <strong>：</strong><ul><li>[Asset Unused] 項目はコード内で使用されていませんが、画像リソースフォルダには存在します <em>p.s 画像が動的な変数で提供されている場合、チェックツールは認識できません。その場合は <code class="language-plaintext highlighter-rouge">ignoredUnusedNames</code> に追加して例外に設定してください。</em></ul></ul><p>他の操作は多言語チェックツールと同様なのでここでは省略します；最も重要なのは、<strong>調整後に必ずコンパイルして実行ファイルにし、run script の内容を実行ファイルに変更することを忘れないでください！</strong></p><h4 id="自分のツールを開発しよう"><span class="me-2">自分のツールを開発しよう！</span><a href="#自分のツールを開発しよう" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><blockquote><p><strong><em>画像リソースチェックツールのスクリプトを参考にできます：</em></strong></p></blockquote><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+</pre><td class="rouge-code"><pre><span class="cp">#!/usr/bin/env xcrun --sdk macosx swift</span>
+
+<span class="kd">import</span> <span class="kt">Foundation</span>
+
+<span class="c1">// 設定してください \o/</span>
+<span class="k">var</span> <span class="nv">sourcePathOption</span><span class="p">:</span><span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
+<span class="k">var</span> <span class="nv">assetCatalogPathOption</span><span class="p">:</span><span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span>
+<span class="k">let</span> <span class="nv">ignoredUnusedNames</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">in</span> <span class="kt">CommandLine</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="nf">enumerated</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="n">index</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sourcePathOption</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">assetCatalogPathOption</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="k">default</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">guard</span> <span class="k">let</span> <span class="nv">sourcePath</span> <span class="o">=</span> <span class="n">sourcePathOption</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"AssetChecker:: error: ソースパスが指定されていません！"</span><span class="p">)</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">guard</span> <span class="k">let</span> <span class="nv">assetCatalogAbsolutePath</span> <span class="o">=</span> <span class="n">assetCatalogPathOption</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"AssetChecker:: error: アセットカタログのパスが指定されていません！"</span><span class="p">)</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="s">"</span><span class="se">\(</span><span class="n">sourcePath</span><span class="se">)</span><span class="s"> 内のソースから </span><span class="se">\(</span><span class="n">assetCatalogAbsolutePath</span><span class="se">)</span><span class="s"> のアセットを検索中"</span><span class="p">)</span>
+
+<span class="cm">/* ここに誤検知するアセットを追加してください
+ 例えば、実行時にアセット名を生成する場合など
+let ignoredUnusedNames = [
+    "IconArticle",
+    "IconMedia",
+    "voteEN",
+    "voteES",
+    "voteFR"
+] 
+*/</span>
+
+
+<span class="c1">// MARK : - 設定終了</span>
+<span class="kd">func</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">_</span> <span class="nv">enumerator</span><span class="p">:</span> <span class="kt">FileManager</span><span class="o">.</span><span class="kt">DirectoryEnumerator</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">elements</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+    <span class="k">while</span> <span class="k">let</span> <span class="nv">e</span> <span class="o">=</span> <span class="n">enumerator</span><span class="p">?</span><span class="o">.</span><span class="nf">nextObject</span><span class="p">()</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">{</span>
+        <span class="n">elements</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">elements</span>
+<span class="p">}</span>
+
+
+<span class="c1">// MARK: - アセット一覧取得</span>
+<span class="kd">func</span> <span class="nf">listAssets</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">extensionName</span> <span class="o">=</span> <span class="s">"imageset"</span>
+    <span class="k">let</span> <span class="nv">enumerator</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="nf">enumerator</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span> <span class="n">assetCatalogAbsolutePath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">enumerator</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="n">extensionName</span><span class="p">)</span> <span class="p">}</span>                             <span class="c1">// アセットかどうか</span>
+        <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">replacingOccurrences</span><span class="p">(</span><span class="nv">of</span><span class="p">:</span> <span class="s">".</span><span class="se">\(</span><span class="n">extensionName</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span> <span class="p">}</span> <span class="c1">// 拡張子を削除</span>
+        <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">components</span><span class="p">(</span><span class="nv">separatedBy</span><span class="p">:</span> <span class="s">"/"</span><span class="p">)</span><span class="o">.</span><span class="n">last</span> <span class="p">??</span> <span class="nv">$0</span> <span class="p">}</span>                 <span class="c1">// フォルダパスを削除</span>
+<span class="p">}</span>
+
+
+<span class="c1">// MARK: - コード内で使用されているアセット一覧取得</span>
+<span class="kd">func</span> <span class="nf">localizedStrings</span><span class="p">(</span><span class="nv">inStringFile</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">localizedStrings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+    <span class="k">let</span> <span class="nv">namePattern</span> <span class="o">=</span> <span class="s">"([</span><span class="se">\\</span><span class="s">w-]+)"</span>
+    <span class="k">let</span> <span class="nv">patterns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">"#imageLiteral</span><span class="se">\\</span><span class="s">(resourceName: </span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"\\</span><span class="s">)"</span><span class="p">,</span> <span class="c1">// Image Literal</span>
+        <span class="s">"UIImage</span><span class="se">\\</span><span class="s">(named:</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"\\</span><span class="s">)"</span><span class="p">,</span> <span class="c1">// SwiftのUIImage呼び出し</span>
+        <span class="s">"UIImage imageNamed:</span><span class="se">\\</span><span class="s">s*</span><span class="se">\\</span><span class="s">@</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// UIImageの呼び出し</span>
+        <span class="s">"</span><span class="se">\\</span><span class="s">&lt;image name=</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"</span><span class="s">.*"</span><span class="p">,</span> <span class="c1">// Storyboardのリソース</span>
+        <span class="s">"R.image.</span><span class="se">\(</span><span class="n">namePattern</span><span class="se">)\\</span><span class="s">(</span><span class="se">\\</span><span class="s">)"</span> <span class="c1">// R.swift対応</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="k">in</span> <span class="n">patterns</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span>
+        <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="kt">NSRange</span><span class="p">(</span><span class="nv">location</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nv">length</span><span class="p">:(</span><span class="n">inStringFile</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">regex</span><span class="p">?</span><span class="o">.</span><span class="nf">enumerateMatches</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="n">inStringFile</span><span class="p">,</span><span class="nv">options</span><span class="p">:</span> <span class="p">[],</span> <span class="nv">range</span><span class="p">:</span> <span class="n">range</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="k">in</span>
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">r</span> <span class="o">=</span> <span class="n">result</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">inStringFile</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">localizedStrings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">localizedStrings</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">listUsedAssetLiterals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">enumerator</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="nf">enumerator</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span><span class="n">sourcePath</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">sourcePath</span><span class="p">)</span>
+    
+    <span class="cp">#if swift(&gt;=4.1)</span>
+        <span class="k">return</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">enumerator</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".m"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".swift"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".xib"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".storyboard"</span><span class="p">)</span> <span class="p">}</span>    <span class="c1">// SwiftとObj-Cファイルのみ</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="s">"</span><span class="se">\(</span><span class="n">sourcePath</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>                              <span class="c1">// ファイルパスを生成</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="nv">$0</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)}</span>    <span class="c1">// ファイル内容を取得</span>
+            <span class="o">.</span><span class="n">compactMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>
+            <span class="o">.</span><span class="n">compactMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                             <span class="c1">// nilを除去</span>
+            <span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">localizedStrings</span><span class="p">)</span>                                      <span class="c1">// localizedStringsを検索</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// 平坦化</span>
+    <span class="cp">#else</span>
+        <span class="k">return</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">enumerator</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".m"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".swift"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".xib"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".storyboard"</span><span class="p">)</span> <span class="p">}</span>    <span class="c1">// SwiftとObj-Cファイルのみ</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="s">"</span><span class="se">\(</span><span class="n">sourcePath</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>                              <span class="c1">// ファイルパスを生成</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="nv">$0</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)}</span>    <span class="c1">// ファイル内容を取得</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// nilを除去</span>
+            <span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">localizedStrings</span><span class="p">)</span>                                      <span class="c1">// localizedStringsを検索</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// 平坦化</span>
+    <span class="cp">#endif</span>
+<span class="p">}</span>
+
+
+<span class="c1">// MARK: - スクリプト開始</span>
+<span class="k">let</span> <span class="nv">assets</span> <span class="o">=</span> <span class="kt">Set</span><span class="p">(</span><span class="nf">listAssets</span><span class="p">())</span>
+<span class="k">let</span> <span class="nv">used</span> <span class="o">=</span> <span class="kt">Set</span><span class="p">(</span><span class="nf">listUsedAssetLiterals</span><span class="p">()</span> <span class="o">+</span> <span class="n">ignoredUnusedNames</span><span class="p">)</span>
+
+
+<span class="c1">// 未使用アセットの警告を生成</span>
+<span class="k">let</span> <span class="nv">unused</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="nf">subtracting</span><span class="p">(</span><span class="n">used</span><span class="p">)</span>
+<span class="n">unused</span><span class="o">.</span><span class="n">forEach</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="s">"</span><span class="se">\(</span><span class="n">assetCatalogAbsolutePath</span><span class="se">)</span><span class="s">:: warning: [Asset Unused] </span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span><span class="p">)</span> <span class="p">}</span>
+
+
+<span class="c1">// 壊れた（存在しない）アセットのエラーを生成</span>
+<span class="k">let</span> <span class="nv">broken</span> <span class="o">=</span> <span class="n">used</span><span class="o">.</span><span class="nf">subtracting</span><span class="p">(</span><span class="n">assets</span><span class="p">)</span>
+<span class="n">broken</span><span class="o">.</span><span class="n">forEach</span> <span class="p">{</span> <span class="nf">print</span><span class="p">(</span><span class="s">"</span><span class="se">\(</span><span class="n">assetCatalogAbsolutePath</span><span class="se">)</span><span class="s">:: error: [Asset Missing] </span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="k">if</span> <span class="n">broken</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+    <span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>言語チェックスクリプトと比べて、このスクリプトはシンプルで重要な機能がすべて揃っており、とても参考になります！</p><p><em>P.S コードに <code class="language-plaintext highlighter-rouge">localizedStrings()</code> という名前が出てくるのは、多言語チェックツールのロジックから流用してメソッド名を変更し忘れたと思われます XD</em></p><p><strong>例えば：</strong></p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="k">for</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">in</span> <span class="kt">CommandLine</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="nf">enumerated</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="n">index</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1">// 引数1</span>
+    <span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1">// 引数2</span>
+    <span class="k">default</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>^外部パラメータを受け取る方法</p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre><td class="rouge-code"><pre><span class="kd">func</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">_</span> <span class="nv">enumerator</span><span class="p">:</span> <span class="kt">FileManager</span><span class="o">.</span><span class="kt">DirectoryEnumerator</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">elements</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+    <span class="k">while</span> <span class="k">let</span> <span class="nv">e</span> <span class="o">=</span> <span class="n">enumerator</span><span class="p">?</span><span class="o">.</span><span class="nf">nextObject</span><span class="p">()</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">{</span>
+        <span class="n">elements</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">elements</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">localizedStrings</span><span class="p">(</span><span class="nv">inStringFile</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">localizedStrings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+    <span class="k">let</span> <span class="nv">namePattern</span> <span class="o">=</span> <span class="s">"([</span><span class="se">\\</span><span class="s">w-]+)"</span>
+    <span class="k">let</span> <span class="nv">patterns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">"#imageLiteral</span><span class="se">\\</span><span class="s">(resourceName: </span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"\\</span><span class="s">)"</span><span class="p">,</span> <span class="c1">// 画像リテラル</span>
+        <span class="s">"UIImage</span><span class="se">\\</span><span class="s">(named:</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"\\</span><span class="s">)"</span><span class="p">,</span> <span class="c1">// デフォルトの UIImage 呼び出し (Swift)</span>
+        <span class="s">"UIImage imageNamed:</span><span class="se">\\</span><span class="s">s*</span><span class="se">\\</span><span class="s">@</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"</span><span class="s">"</span><span class="p">,</span> <span class="c1">// デフォルトの UIImage 呼び出し</span>
+        <span class="s">"</span><span class="se">\\</span><span class="s">&lt;image name=</span><span class="se">\"\(</span><span class="n">namePattern</span><span class="se">)\"</span><span class="s">.*"</span><span class="p">,</span> <span class="c1">// ストーリーボードのリソース</span>
+        <span class="s">"R.image.</span><span class="se">\(</span><span class="n">namePattern</span><span class="se">)\\</span><span class="s">(</span><span class="se">\\</span><span class="s">)"</span> <span class="c1">// R.swift サポート</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="k">in</span> <span class="n">patterns</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span>
+        <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="kt">NSRange</span><span class="p">(</span><span class="nv">location</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nv">length</span><span class="p">:(</span><span class="n">inStringFile</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">regex</span><span class="p">?</span><span class="o">.</span><span class="nf">enumerateMatches</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="n">inStringFile</span><span class="p">,</span><span class="nv">options</span><span class="p">:</span> <span class="p">[],</span> <span class="nv">range</span><span class="p">:</span> <span class="n">range</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="k">in</span>
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">r</span> <span class="o">=</span> <span class="n">result</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">inStringFile</span> <span class="k">as</span> <span class="kt">NSString</span><span class="p">)</span><span class="o">.</span><span class="nf">substring</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">at</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">localizedStrings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">localizedStrings</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nf">listUsedAssetLiterals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">enumerator</span> <span class="o">=</span> <span class="kt">FileManager</span><span class="o">.</span><span class="k">default</span><span class="o">.</span><span class="nf">enumerator</span><span class="p">(</span><span class="nv">atPath</span><span class="p">:</span><span class="n">sourcePath</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">sourcePath</span><span class="p">)</span>
+    
+    <span class="cp">#if swift(&gt;=4.1)</span>
+        <span class="k">return</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">enumerator</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".m"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".swift"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".xib"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".storyboard"</span><span class="p">)</span> <span class="p">}</span>    <span class="c1">// Swift と Obj-C ファイルのみ</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="s">"</span><span class="se">\(</span><span class="n">sourcePath</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>                              <span class="c1">// ファイルパスを作成</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="nv">$0</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)}</span>    <span class="c1">// ファイル内容を取得</span>
+            <span class="o">.</span><span class="n">compactMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>
+            <span class="o">.</span><span class="n">compactMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                             <span class="c1">// nil を除去</span>
+            <span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">localizedStrings</span><span class="p">)</span>                                      <span class="c1">// localizedStrings の出現を検索</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// フラット化</span>
+    <span class="cp">#else</span>
+        <span class="k">return</span> <span class="nf">elementsInEnumerator</span><span class="p">(</span><span class="n">enumerator</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".m"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".swift"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".xib"</span><span class="p">)</span> <span class="p">\\</span><span class="o">|</span><span class="p">\\</span><span class="o">|</span> <span class="nv">$0</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">".storyboard"</span><span class="p">)</span> <span class="p">}</span>    <span class="c1">// Swift と Obj-C ファイルのみ</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="s">"</span><span class="se">\(</span><span class="n">sourcePath</span><span class="se">)</span><span class="s">/</span><span class="se">\(</span><span class="nv">$0</span><span class="se">)</span><span class="s">"</span> <span class="p">}</span>                              <span class="c1">// ファイルパスを作成</span>
+            <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="k">try</span><span class="p">?</span> <span class="kt">String</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="nv">$0</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="o">.</span><span class="n">utf8</span><span class="p">)}</span>    <span class="c1">// ファイル内容を取得</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// nil を除去</span>
+            <span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">localizedStrings</span><span class="p">)</span>                                      <span class="c1">// localizedStrings の出現を検索</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">{</span><span class="nv">$0</span><span class="p">}</span>                                                <span class="c1">// フラット化</span>
+    <span class="cp">#endif</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>^すべてのプロジェクトファイルを走査して正規表現でマッチングする方法</p><div class="language-swift highlighter-rouge"><div class="code-header"> <span data-label-text="Swift"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="コピーしました！"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="c1">// ビルド時にエラーを表示するには ❌：</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"Project檔案.lproj"</span> <span class="o">+</span> <span class="s">"/檔案:行: "</span> <span class="o">+</span> <span class="s">"error: エラーメッセージ"</span><span class="p">)</span>
+<span class="c1">// ビルド時に警告を表示するには ⚠️：</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"Project檔案.lproj"</span> <span class="o">+</span> <span class="s">"/檔案:行: "</span> <span class="o">+</span> <span class="s">"warning: 警告メッセージ"</span><span class="p">)</span>
+</pre></table></code></div></div><p>^エラーまたは警告を出力する</p><p>以上のプログラム方法を総合的に参考にして、自分の欲しいツールを作成できます。</p><h3 id="まとめ"><span class="me-2">まとめ</span><a href="#まとめ" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>これらのチェックツールを導入することで、開発がより安心で効率的になり、冗長さも減らせます。また、今回の経験で視野が広がったため、今後新しいビルドランスクリプトの要件があっても、最も慣れ親しんだ Swift 言語で直接作成できます！</p><p>ご質問やご意見がありましたら、<a href="https://www.zhgchg.li/contact" target="_blank">こちらからご連絡ください</a> 。</p><p><em><a href="https://medium.com/zrealm-ios-dev/xcode-%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8-swift-%E6%92%B0%E5%AF%AB-run-script-41c49a75a743" target="_blank">Post</a> は Medium から <a href="https://github.com/ZhgChgLi/ZMediumToMarkdown" target="_blank">ZMediumToMarkdown</a> によって変換されました。</em><script src="/assets/clipboard.min.js"></script></p><div style=" display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; background:#f9fafb; padding:12px 16px; border-radius:12px; margin:18px 0; box-shadow:0 3px 8px rgba(0,0,0,0.05); width: auto;"> <input id="share-url" value="https://jp.zhgchg.li/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/xcode%E3%81%A7swift%E3%82%92%E6%B4%BB%E7%94%A8-run-script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA-41c49a75a743/" readonly="" style=" flex:1; border:1px solid #d1d5db; border-radius:8px; padding:10px 12px; font-size:0.9rem; background:#ffffff; color:#111827; outline:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; " /> <button class="btn" data-clipboard-target="#share-url" id="copy-btn" style=" border:none; background:#3b82f6; color:white; padding:10px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:600; display:flex; align-items:center; gap:6px; transition:all .15s ease; box-shadow:0 2px 5px rgba(59,130,246,0.35); " onmouseover="this.style.opacity='0.92';" onmouseout="this.style.opacity='1';"> <span style="font-size:1rem;">🔗</span> <span id="copy-btn-text">Copy link to share!</span> </button></div><script> new ClipboardJS('.btn'); var btn = document.getElementById("copy-btn"); var text = document.getElementById("copy-btn-text"); btn.addEventListener("click", function () { text.textContent = "Copied!"; btn.style.background = "#16a34a"; btn.style.boxShadow = "0 2px 6px rgba(22,163,74,0.35)"; setTimeout(() => { text.textContent = "Copy link to share!"; btn.style.background = "#3b82f6"; btn.style.boxShadow = "0 2px 5px rgba(59,130,246,0.35)"; }, 1500); });</script><hr /><p><a href="https://www.paypal.com/ncp/payment/CMALMPT8UUTY2" target="_blank" rel="noopener" style="display:block;margin:12px 0;text-align:center;align-items:center;justify-content:center;padding:10px 22px;border-radius:999px;text-decoration:none;background:linear-gradient(135deg,#ffd54f,#ffb300);color:#000;font-size:16px;font-weight:700;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 4px 10px rgba(0,0,0,.15);cursor:pointer;transition:all .15s ease;width:350px" onmouseover="this.style.background=&quot;linear-gradient(135deg,#FFE082,#FFC107)&quot;,this.style.transform=&quot;translateY(-1px)&quot;,this.style.boxShadow=&quot;0 6px 14px rgba(0,0,0,0.2)&quot;" onmouseout="this.style.background=&quot;linear-gradient(135deg,#FFD54F,#FFB300)&quot;,this.style.transform=&quot;translateY(0)&quot;,this.style.boxShadow=&quot;0 4px 10px rgba(0,0,0,0.15)&quot;">🍺 Buy me a beer on PayPal</a></p><blockquote class="prompt-tip"><p>👉👉👉 <a href="https://medium.com/@zhgchgli" target="_blank"><strong>Follow Me On Medium!</strong> (1,050+ Followers)</a> 👈👈👈</p></blockquote><blockquote class="prompt-info"><p>本記事は AI による翻訳をもとに作成されています。表現が不自然な箇所がありましたら、ぜひコメントでお知らせください。</p></blockquote><blockquote class="prompt-info"><p>本記事は Medium にて初公開されました（<a href="https://medium.com/p/41c49a75a743" target="_blank"><strong>こちらからオリジナル版を確認</strong></a>）。<a href="/posts/tools/medium-to-jekyll/" target="_blank">ZMediumToMarkdown</a> による自動変換・同期技術を使用しています。</p></blockquote><blockquote class="prompt-info"><p><a href="https://github.com/ZhgChgLi/zhgchgli.github.io/blob/main/_posts/jp/zmediumtomarkdown/2020-09-17-41c49a75a743.md" target="_blank">Improve this page on Github.</a></p></blockquote></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw me-1"></i> <a href="/categories/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/">ZRealmの開発</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw me-1"></i> <a href="/tags/ios/" class="post-tag no-text-decoration" >ios</a> <a href="/tags/shell-script/" class="post-tag no-text-decoration" >shell-script</a> <a href="/tags/xcode/" class="post-tag no-text-decoration" >xcode</a> <a href="/tags/ios%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA/" class="post-tag no-text-decoration" >iosアプリ開発</a> <a href="/tags/%E3%83%84%E3%83%BC%E3%83%AB%E3%82%AD%E3%83%83%E3%83%88/" class="post-tag no-text-decoration" >ツールキット</a> <a href="/tags/japanese/" class="post-tag no-text-decoration" >japanese</a> <a href="/tags/ai-translation/" class="post-tag no-text-decoration" >ai-translation</a></div><div class=" post-tail-bottom d-flex justify-content-between align-items-center mt-5 pb-2 " ><div class="license-wrapper"> 本記事は著者により <a href="https://creativecommons.org/licenses/by/4.0/deed.ja"> CC BY 4.0 </a> に基づき公開されています。</div><div class="share-wrapper d-flex align-items-center"> <span class="share-label text-muted">シェア</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Xcode%E3%81%A7Swift%E3%82%92%E6%B4%BB%E7%94%A8%EF%BD%9CRun%20Script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA%20-%20ZhgChgLi%20(Harry%20Li)&url=https%3A%2F%2Fjp.zhgchg.li%2Fposts%2Fzrealm%25E3%2581%25AE%25E9%2596%258B%25E7%2599%25BA%2Fxcode%25E3%2581%25A7swift%25E3%2582%2592%25E6%25B4%25BB%25E7%2594%25A8-run-script%25E3%2581%25A7%25E5%25A4%259A%25E8%25A8%2580%25E8%25AA%259E%25E3%2581%25A8%25E7%2594%25BB%25E5%2583%258F%25E8%25B3%2587%25E7%2594%25A3%25E3%2581%25AE%25E6%25AC%25A0%25E6%2590%258D%25E3%2582%2592%25E8%2587%25AA%25E5%258B%2595%25E6%25A4%259C%25E5%2587%25BA-41c49a75a743%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Twitter" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Xcode%E3%81%A7Swift%E3%82%92%E6%B4%BB%E7%94%A8%EF%BD%9CRun%20Script%E3%81%A7%E5%A4%9A%E8%A8%80%E8%AA%9E%E3%81%A8%E7%94%BB%E5%83%8F%E8%B3%87%E7%94%A3%E3%81%AE%E6%AC%A0%E6%90%8D%E3%82%92%E8%87%AA%E5%8B%95%E6%A4%9C%E5%87%BA%20-%20ZhgChgLi%20(Harry%20Li)&u=https%3A%2F%2Fjp.zhgchg.li%2Fposts%2Fzrealm%25E3%2581%25AE%25E9%2596%258B%25E7%2599%25BA%2Fxcode%25E3%2581%25A7swift%25E3%2582%2592%25E6%25B4%25BB%25E7%2594%25A8-run-script%25E3%2581%25A7%25E5%25A4%259A%25E8%25A8%2580%25E8%25AA%259E%25E3%2581%25A8%25E7%2594%25BB%25E5%2583%258F%25E8%25B3%2587%25E7%2594%25A3%25E3%2581%25AE%25E6%25AC%25A0%25E6%2590%258D%25E3%2582%2592%25E8%2587%25AA%25E5%258B%2595%25E6%25A4%259C%25E5%2587%25BA-41c49a75a743%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Facebook" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fjp.zhgchg.li%2Fposts%2Fzrealm%25E3%2581%25AE%25E9%2596%258B%25E7%2599%25BA%2Fxcode%25E3%2581%25A7swift%25E3%2582%2592%25E6%25B4%25BB%25E7%2594%25A8-run-script%25E3%2581%25A7%25E5%25A4%259A%25E8%25A8%2580%25E8%25AA%259E%25E3%2581%25A8%25E7%2594%25BB%25E5%2583%258F%25E8%25B3%2587%25E7%2594%25A3%25E3%2581%25AE%25E6%25AC%25A0%25E6%2590%258D%25E3%2582%2592%25E8%2587%25AA%25E5%258B%2595%25E6%25A4%259C%25E5%2587%25BA-41c49a75a743%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Linkedin" aria-label="Linkedin"> <i class="fa-fw fab fa-linkedin"></i> </a> <button id="copy-link" aria-label="Copy link" class="btn small" data-bs-toggle="tooltip" data-bs-placement="top" title="リンクをコピー" data-title-succeed="リンクをコピーしました！" > <i class="fa-fw fas fa-link pe-none fs-6"></i> </button> </span></div></div></div></article></main><aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted"><div class="access"><section id="access-lastmod"><h2 class="panel-heading">最終更新</h2><ul class="content list-unstyled ps-0 pb-1 ms-1 mt-2"><li class="text-truncate lh-lg"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/app-store-connect-api-webhook-ci-cd%E8%87%AA%E5%8B%95%E5%8C%96%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AE%E5%8A%B9%E6%9E%9C%E7%9A%84%E9%80%A3%E6%90%BA%E6%96%B9%E6%B3%95-7c0974856393/">App Store Connect API Webhook｜CI/CD自動化ワークフローの効果的連携方法</a><li class="text-truncate lh-lg"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/ci-cd-%E5%AE%9F%E8%B7%B5%E3%82%AC%E3%82%A4%E3%83%89-ios%E9%96%8B%E7%99%BA%E3%83%81%E3%83%BC%E3%83%A0%E5%90%91%E3%81%91%E5%AE%89%E5%AE%9A-%E5%8A%B9%E7%8E%87%E5%8C%96%E3%81%AE%E7%A7%98%E8%A8%A3%E3%81%A8%E6%9C%80%E9%81%A9%E3%83%84%E3%83%BC%E3%83%AB%E9%81%B8%E5%AE%9A-c008a9e8ceca/">CI/CD 実践ガイド｜iOS開発チーム向け安定・効率化の秘訣と最適ツール選定</a><li class="text-truncate lh-lg"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/google-apps-script-web-app%E3%81%A7github-action-ci-cd%E3%82%92%E5%8A%B9%E7%8E%87%E5%8C%96-%E3%83%95%E3%82%A9%E3%83%BC%E3%83%A0%E9%80%A3%E6%90%BA%E3%81%A7%E9%96%8B%E7%99%BA%E3%82%B9%E3%83%94%E3%83%BC%E3%83%89%E5%90%91%E4%B8%8A-4cb4437818f2/">Google Apps Script Web AppでGithub Action CI/CDを効率化｜フォーム連携で開発スピード向上</a><li class="text-truncate lh-lg"> <a href="/posts/zrealm-robotic-process-automation/github-action-zreviewtender%E3%81%A7%E7%84%A1%E6%96%99%E5%8D%B3%E6%99%82app%E8%A9%95%E4%BE%A1%E7%9B%A3%E8%A6%96%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E3%82%92%E7%B0%A1%E5%8D%983%E3%82%B9%E3%83%86%E3%83%83%E3%83%97%E3%81%A7%E6%A7%8B%E7%AF%89-0095528cf875/">Github Action｜ZReviewTenderで無料即時App評価監視ロボットを簡単3ステップで構築</a><li class="text-truncate lh-lg"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/ios-timer-dispatchsourcetimer%E3%81%AE%E9%81%B8%E3%81%B3%E6%96%B9%E3%81%A8%E5%AE%89%E5%85%A8%E3%81%AA%E4%BD%BF%E3%81%84%E6%96%B9%E3%82%92%E5%BE%B9%E5%BA%95%E8%A7%A3%E8%AA%AC-62f68ebeecd3/">iOS Timer｜DispatchSourceTimerの選び方と安全な使い方を徹底解説</a></ul></section><section><h2 class="panel-heading">人気タグ</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/ai-translation/">ai-translation</a> <a class="post-tag btn btn-outline-primary" href="/tags/japanese/">japanese</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA/">iOSアプリ開発</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA/">iosアプリ開発</a> <a class="post-tag btn btn-outline-primary" href="/tags/%E7%94%9F%E6%B4%BB/">生活</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios/">ios</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios/">iOS</a> <a class="post-tag btn btn-outline-primary" href="/tags/swift/">swift</a> <a class="post-tag btn btn-outline-primary" href="/tags/swift/">Swift</a> <a class="post-tag btn btn-outline-primary" href="/tags/%E9%96%8B%E7%AE%B1/">開箱</a></div></section></div><div class="toc-border-cover z-3"></div><section id="toc-wrapper" class="invisible position-sticky ps-0 pe-4 pb-4"><h2 class="panel-heading ps-3 pb-2 mb-0">目次 🔖</h2><nav id="toc"></nav></section></aside></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4"><aside id="related-posts" aria-labelledby="related-label"><h3 class="mb-4" id="related-label">関連記事</h3><nav class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4"><article class="col"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/universal-links-ios-13-14%E5%AF%BE%E5%BF%9C%E3%81%AE%E6%9C%80%E6%96%B0%E5%8B%95%E5%90%91%E3%81%A8%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%83%86%E3%82%B9%E3%83%88%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E6%B3%95-12c5026da33d/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1612411045" data-df="YYYY年M月D日" > 2021年02月04日 </time><h4 class="pt-0 my-2">Universal Links｜iOS 13・14対応の最新動向とローカルテスト環境構築法</h4><div class="text-muted"><p>iOS 13・14でのUniversal Linksの課題を解決し、ローカルテスト環境を効率的に構築する方法を紹介。開発者が直面するリンク開閉問題を改善し、スムーズなユーザー体験を実現します。</p></div></div></a></article><article class="col"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/avplayer-%E6%9C%AC%E5%9C%B0cache%E6%A9%9F%E8%83%BD%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-avurlasset%E3%81%A8avassetresourceloaderdelegate%E6%B4%BB%E7%94%A8%E6%B3%95-6ce488898003/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1612089702" data-df="YYYY年M月D日" > 2021年01月31日 </time><h4 class="pt-0 my-2">AVPlayer｜本地Cache機能の完全ガイド：AVURLAssetとAVAssetResourceLoaderDelegate活用法</h4><div class="text-muted"><p>AVPlayerとAVQueuePlayerでの本地Cache構築に悩む開発者向け。AVURLAssetとAVAssetResourceLoaderDelegateを駆使し、再生の安定性と効率を最大化する具体的手法を解説。</p></div></div></a></article><article class="col"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/ios-app-%E7%89%88%E6%9C%AC%E8%99%9F%E7%AE%A1%E7%90%86-%E3%83%AB%E3%83%BC%E3%83%AB%E8%A7%A3%E8%AA%AC%E3%81%A8%E6%AF%94%E8%BC%83%E3%81%A7%E6%9C%80%E9%81%A9%E8%A7%A3%E3%82%92%E5%B0%8E%E3%81%8F-c4d7c2ce5a8d/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1608215588" data-df="YYYY年M月D日" > 2020年12月17日 </time><h4 class="pt-0 my-2">iOS APP 版本號管理｜ルール解説と比較で最適解を導く</h4><div class="text-muted"><p>iOSアプリ開発者向けに、バージョン番号のルールと比較方法を明確化。複雑な判定を簡素化し、正確なバージョン管理でリリースミスを防止します。効率的な運用を実現し、開発品質を向上させる具体的な解決策を紹介。</p></div></div></a></article></nav></aside><nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation"> <a href="/posts/zrealm%E3%81%AE%E9%96%8B%E7%99%BA/ios-14-%E5%89%AA%E8%B2%BC%E7%B0%BF%E8%AA%AD%E3%81%BF%E5%8F%96%E3%82%8A%E5%95%8F%E9%A1%8C-%E3%83%97%E3%83%A9%E3%82%A4%E3%83%90%E3%82%B7%E3%83%BC%E3%81%A8%E5%88%A9%E4%BE%BF%E6%80%A7%E3%81%AE%E3%82%B8%E3%83%AC%E3%83%B3%E3%83%9E%E3%82%92%E8%A7%A3%E8%AA%AC-%E5%AF%BE%E7%AD%96%E3%81%A8%E5%BD%B1%E9%9F%BF-8a04443024e2/" class="btn btn-outline-primary" aria-label="前の記事" ><p>iOS 14 剪貼簿読み取り問題：プライバシーと利便性のジレンマを解説｜対策と影響</p></a> <a href="/posts/zrealm%E3%81%AE%E7%94%9F%E6%B4%BB/apple-watch-series-6-%E9%96%8B%E7%AE%B1-2%E5%B9%B4%E4%BD%BF%E7%94%A8%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E3%81%A8%E9%81%B8%E3%81%B3%E6%96%B9%E3%82%AC%E3%82%A4%E3%83%89-eab0e984043/" class="btn btn-outline-primary" aria-label="次の記事" ><p>Apple Watch Series 6 開箱｜2年使用レビューと選び方ガイド</p></a></nav><footer aria-label="Site Info" class=" d-flex flex-column justify-content-center text-muted flex-lg-row justify-content-lg-between align-items-lg-center pb-lg-3 " ><p>© <time>2025</time> <a href="https://medium.com/@zhgchgli">ZhgChgLi</a>. <span data-bs-toggle="tooltip" data-bs-placement="top" title="特に記載がない限り、本サイト上のすべての記事は、 著者によりクリエイティブ・コモンズ 表示 4.0 国際 （CC BY 4.0）ライセンスの下で公開されています。" >All rights reserved.</span> <br/> 最終更新日時:2025-12-31 00:36:43 +08:00</p><p>本サイトは <a data-bs-toggle="tooltip" data-bs-placement="top" title="v7.2.4" href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener" >Chirpy</a> テーマを使用し、<a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> 上で構築されています。<br/> Medium の記事は <a href="https://github.com/ZhgChgLi/ZMediumToMarkdown" target="_blank">ZMediumToMarkdown</a> により変換されています。</p></footer></div></div><div id="search-result-wrapper" class="d-flex justify-content-center d-none"><div class="col-11 content"><div id="search-hints"><section><h2 class="panel-heading">人気タグ</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/ai-translation/">ai-translation</a> <a class="post-tag btn btn-outline-primary" href="/tags/japanese/">japanese</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA/">iOSアプリ開発</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios%E3%82%A2%E3%83%97%E3%83%AA%E9%96%8B%E7%99%BA/">iosアプリ開発</a> <a class="post-tag btn btn-outline-primary" href="/tags/%E7%94%9F%E6%B4%BB/">生活</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios/">ios</a> <a class="post-tag btn btn-outline-primary" href="/tags/ios/">iOS</a> <a class="post-tag btn btn-outline-primary" href="/tags/swift/">swift</a> <a class="post-tag btn btn-outline-primary" href="/tags/swift/">Swift</a> <a class="post-tag btn btn-outline-primary" href="/tags/%E9%96%8B%E7%AE%B1/">開箱</a></div></section></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><aside aria-label="Scroll to Top"> <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow"> <i class="fas fa-angle-up"></i> </button></aside></div><div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div><aside id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-animation="true" data-bs-autohide="false" ><div class="toast-header"> <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close" ></button></div><div class="toast-body text-center pt-0"><p class="px-2 mb-3">新しいバージョンのコンテンツが見つかりました。</p><button type="button" class="btn btn-primary" aria-label="Update"> 更新 </button></div></aside><script> (function () { const themeMapper = Theme.getThemeMapper('light', 'dark_dimmed'); const initTheme = themeMapper[Theme.visualState]; let lang = 'en';if (lang.length > 2 && !lang.startsWith('zh')) { lang = lang.slice(0, 2); } let giscusAttributes = { src: 'https://giscus.app/client.js', 'data-repo': 'ZhgChgLi/zhgchgli-jp.github.io', 'data-repo-id': 'R_kgDOQxMupQ', 'data-category': 'General', 'data-category-id': 'DIC_kwDOQxMupc4C0Zj4', 'data-mapping': 'url', 'data-strict' : '0', 'data-reactions-enabled': '1', 'data-emit-metadata': '0', 'data-theme': initTheme, 'data-input-position': 'bottom', 'data-lang': lang, 'data-loading': 'lazy', crossorigin: 'anonymous', async: '' }; let giscusNode = document.createElement('script'); Object.entries(giscusAttributes).forEach(([key, value]) => giscusNode.setAttribute(key, value) ); const $footer = document.querySelector('footer'); $footer.insertAdjacentElement("beforebegin", giscusNode); addEventListener('message', (event) => { if (event.source === window && event.data && event.data.id === Theme.ID) { const newTheme = themeMapper[Theme.visualState]; const message = { setConfig: { theme: newTheme } }; const giscus = document.getElementsByClassName('giscus-frame')[0].contentWindow; giscus.postMessage({ giscus: message }, 'https://giscus.app'); } }); })(); </script> <script> document.addEventListener('DOMContentLoaded', () => { SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<article class="px-1 px-sm-2 px-lg-4 px-xl-0"><header><h2><a href="{url}">{title}</a></h2><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div></header><p>{snippet}</p></article>', noResultsText: '<p class="mt-5">該当する結果が見つかりません。</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="me-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); }); </script>

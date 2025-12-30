@@ -2,4 +2,4 @@ User-agent: *
 
 Disallow: /norobots/
 
-Sitemap: https://en.zhgchg.li/sitemap.xml
+Sitemap: https://jp.zhgchg.li/sitemap.xml
