@@ -3,7 +3,7 @@ name: After Pages Deployment
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["pages-build-deployment"]
+    workflows: ["Build & Deploy Jekyll site to GitHub Pages"]
     types: [completed]
 
 concurrency:
@@ -13,9 +13,10 @@ concurrency:
 jobs:
   after_deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Print deployment info
+      - name: Sync redirects to Cloudflare rules list
         env:
           CLOUDFLARE_ACCOUNT_ID: "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
           CLOUDFLARE_LIST_ID: "${{ secrets.CLOUDFLARE_LIST_ID }}"
@@ -23,7 +24,7 @@ jobs:
           CLOUDFLARE_REDIRECT_JSON_URL: "${{ secrets.CLOUDFLARE_REDIRECT_JSON_URL }}"
         run: |
           set -euo pipefail
-          
+
           payload="$(curl -fsSL "${CLOUDFLARE_REDIRECT_JSON_URL}jp.zhgchg.li" | jq '
             to_entries
             | map({
@@ -45,8 +46,8 @@ jobs:
             -H "Authorization: Bearer ${CLOUDFLARE_TOKEN}" \
             -H "Content-Type: application/json" \
             --data "$payload" || true)"
-          
+
           echo "$resp"
-          
+
           # 如果 Cloudflare 回 success=false 或根本沒 success，直接 fail
           echo "$resp" | jq -e '.success == true' >/dev/null
